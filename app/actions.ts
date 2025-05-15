@@ -4,6 +4,7 @@ import { encodedRedirect } from "@/utils/utils";
 import { createClient } from "@/utils/supabase/server";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 
 export const signUpAction = async (formData: FormData) => {
   const email = formData.get("email")?.toString();
@@ -131,4 +132,43 @@ export const signOutAction = async () => {
   const supabase = await createClient();
   await supabase.auth.signOut();
   return redirect("/sign-in");
+};
+
+
+export const completeOnboardingAction = async (formData: FormData) => {
+  const supabase = await createClient();
+
+  // Get authenticated user
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    return encodedRedirect("error", "/onboarding", "Not authenticated");
+  }
+
+  const fullname = formData.get("name") as string;
+
+  if (!fullname || fullname.trim() === "") {
+    return encodedRedirect("error", "/onboarding", "Name is required");
+  }
+
+  // Update the Users Profile
+  const { error } = await supabase
+    .from('profiles')
+    .update({
+      full_name: fullname,
+      isonboarded: true,
+    })
+    .eq('id', user.id);
+
+  if (error) {
+    console.error("Supabase update error:", error);
+    return encodedRedirect("error", "/onboarding", error.message);
+  }
+
+  // If everything succeeded, redirect to protected page with success message
+  return encodedRedirect(
+    "success",
+    "/protected",
+    "true"
+  );
 };

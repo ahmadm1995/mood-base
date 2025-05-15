@@ -1,5 +1,5 @@
 import React from 'react'
-import { signInAction } from "@/app/actions";
+import { completeOnboardingAction, signInAction } from "@/app/actions";
 import { FormMessage, Message } from "@/components/form-message";
 import { SubmitButton } from "@/components/submit-button";
 import { Input } from "@/components/ui/input";
@@ -20,7 +20,7 @@ function onboarding() {
                 <Label htmlFor="email">Name</Label>
                 <Input name="name" placeholder="Jane Appleseed" required />
 
-                <SubmitButton formAction={signInAction} pendingText="Signing up...">
+                <SubmitButton formAction={completeOnboardingAction} pendingText="Signing up...">
                   Start Tracking
                 </SubmitButton>
     

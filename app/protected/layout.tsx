@@ -15,6 +15,6 @@ export default async function Layout({
     redirect("/sign-in")
   } 
   return (
-    <div className="flex justify-center items-center flex-grow">{children}</div>
+    <div className="flex  flex-col w-full h-full min-h-screen bg-gradient-blue">{children}</div>
   );
 }
