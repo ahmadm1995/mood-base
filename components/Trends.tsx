@@ -46,16 +46,21 @@ interface PopOverProps {
 
 const Trends: React.FC<TrendsProps> = ({ moodData }) => {
  
-  const sorted = [...moodData].sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
-    useEffect(() => {
-    console.log("Sorted Data for single user:", sorted);
-    }, []);
+  const sorted = [...moodData].sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+  const lastElevenDays = sorted.slice(-11);
+  const sleepLinePositions = [
+    { height: '260px', bottom: '52px' },   // 9+ hours line
+    { height: '208px', bottom: '104px' },  // 7-8 hours line  
+    { height: '156px', bottom: '156px' },  // 5-6 hours line
+    { height: '104px', bottom: '208px' },  // 3-4 hours line
+    { height: '52px', bottom: '260px' },   // 0-2 hours line
+  ]; 
 
   return (
     <>
       <h3 className="my-8 mx-8 reddit-sans-bold text-[32px]">Mood and sleep trends</h3>
         <div className='flex ml-8 mr-[26px]  h-[312px]'>
-          <div className='flex flex-col gap-10 h-full items-start justify-start'>
+          <div className='flex flex-col pr-4 gap-8 h-full items-start justify-start'>
             {sleepDurations.map((sleep) => (
               <div key={sleep.label} className="flex gap-1.5 items-center">
               <img
@@ -68,8 +73,15 @@ const Trends: React.FC<TrendsProps> = ({ moodData }) => {
               </div>
             ))}
           </div>
-          <div className='flex h-full overflow-x-auto gap-4 flex-1'>
-            {sorted.map((mood) => (
+          <div className='flex h-full overflow-x-auto gap-4 flex-1 relative'>
+            {sleepLinePositions.map((line, index) => (
+            <div
+              key={index}
+              className="absolute left-0 right-0 mb-10 border-t border-gray-200 border-dashed"
+              style={{ bottom: line.bottom }}
+            />
+          ))}
+            {lastElevenDays.map((mood) => (
               <MoodTrend key={mood.id} mood={mood}/>
             ))}
           </div>
@@ -89,7 +101,7 @@ export const MoodTrend: React.FC<MoodTrendProps> = ({mood}) => {
   const sleepLabel = getAverageSleepLabel(mood.sleep_hours);
   const MoodIcon = moodLabel.icon;
   const [popOver, setPopOver] = useState<boolean>(false)
-  console.log(moodLabel.color)
+
 
   return (
     <div className='h-full min-w-[40px] flex flex-col items-center gap-3 justify-end relative'>
